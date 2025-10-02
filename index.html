@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <title>My Lap Times</title>
+</head>
+<body>
+  <h1>My Assetto Corsa Times</h1>
+  <div id="content">Loading…</div>
+  <script>
+    fetch("data/times.json")
+      .then(r => r.json())
+      .then(data => {
+        const c = document.getElementById("content");
+        c.innerHTML = "";
+        data.sessions.forEach(s => {
+          c.innerHTML += `<p><b>${s.track} — ${s.car}</b><br>
+            Best Lap: ${s.best_lap} (${s.date})<br>
+            Laps: ${s.laps.join(", ")}</p>`;
+        });
+      });
+  </script>
+</body>
+</html>
