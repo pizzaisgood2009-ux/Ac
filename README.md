@@ -4,7 +4,7 @@ How to Use
 Go to the app
 Open Safari on your iPhone and visit:
 
-https://yourusername.github.io/ac-times/
+https://pizzaisgood2009-ux.github.io/Ac/
 
 
 Add it like an app
