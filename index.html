@@ -1,23 +1,65 @@
 <!doctype html>
 <html>
 <head>
-  <title>My Lap Times</title>
+  <title>Assetto Corsa Lap Times</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    .tabs { display: flex; background: #222; color: white; }
+    .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; }
+    .tab.active { background: #444; font-weight: bold; }
+    .session { border:1px solid #ccc; margin:10px; padding:10px; border-radius:8px; }
+  </style>
 </head>
 <body>
-  <h1>My Assetto Corsa Times</h1>
+  <h1 style="text-align:center;">Assetto Corsa Times</h1>
+  <div class="tabs" id="tabs"></div>
   <div id="content">Loading…</div>
+
   <script>
+    let allData = null;
+    let currentDriver = null;
+
+    function renderTabs(drivers) {
+      const tabs = document.getElementById("tabs");
+      tabs.innerHTML = "";
+      drivers.forEach(d => {
+        const el = document.createElement("div");
+        el.className = "tab" + (d === currentDriver ? " active" : "");
+        el.innerText = d;
+        el.onclick = () => { currentDriver = d; renderContent(); renderTabs(drivers); };
+        tabs.appendChild(el);
+      });
+    }
+
+    function renderContent() {
+      const c = document.getElementById("content");
+      c.innerHTML = "";
+      const filtered = allData.sessions.filter(s => s.driver === currentDriver);
+      if (filtered.length === 0) {
+        c.innerHTML = "<p style='text-align:center;'>No sessions yet.</p>";
+      }
+      filtered.forEach(s => {
+        c.innerHTML += `
+          <div class="session">
+            <b>${s.track} — ${s.car}</b><br>
+            Driver: ${s.driver}<br>
+            Best Lap: ${s.best_lap} (${s.date})<br>
+            Laps: ${s.laps.join(", ")}
+          </div>`;
+      });
+    }
+
     fetch("data/times.json")
       .then(r => r.json())
       .then(data => {
-        const c = document.getElementById("content");
-        c.innerHTML = "";
-        data.sessions.forEach(s => {
-          c.innerHTML += `<p><b>${s.track} — ${s.car}</b><br>
-            Best Lap: ${s.best_lap} (${s.date})<br>
-            Laps: ${s.laps.join(", ")}</p>`;
-        });
+        allData = data;
+        const drivers = [...new Set(data.sessions.map(s => s.driver))];
+        currentDriver = drivers[0]; // default first driver
+        renderTabs(drivers);
+        renderContent();
       });
   </script>
 </body>
 </html>
+
